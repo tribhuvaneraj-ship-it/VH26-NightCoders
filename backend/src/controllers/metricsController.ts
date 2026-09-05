@@ -27,6 +27,7 @@ export function getThroughputMetrics(req: Request, res: Response): void {
     throughputPerSecond: snapshot.throughputPerSecond,
     eventsPerMinute: snapshot.eventsPerMinute,
     workerUtilization: snapshot.workerUtilization,
+    workerSlots: snapshot.workerSlots,
   });
 }
 

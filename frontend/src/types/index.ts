@@ -54,6 +54,7 @@ export interface SystemMetricsSnapshot {
     critical: number;
     high: number;
     low: number;
+    deferred: number;
     total: number;
   };
   processingBreakdown: {
@@ -64,6 +65,14 @@ export interface SystemMetricsSnapshot {
   };
   activeWorkers: number;
   workerUtilization: number;
+  workerSlots: WorkerSlotMetrics;
+}
+
+export interface WorkerSlotMetrics {
+  totalSlots: number; criticalReservedSlots: number; highReservedSlots: number; lowReservedSlots: number;
+  criticalActiveSlots: number; highActiveSlots: number; lowActiveSlots: number;
+  criticalWaiting: number; highWaiting: number; lowWaiting: number;
+  borrowedSlots: number; availableSlots: number;
 }
 
 export interface ComparisonMetrics {

@@ -15,7 +15,7 @@ export function evaluateDecision(
   loadState: SystemLoadState
 ): DecisionResult {
   const { priority, isGuaranteedZeroDrop } = classifyEvent(eventType);
-  const { queueUtilization, trafficRate, systemMode } = loadState;
+  const { queueUtilization, trafficRate, systemMode, workerSlotsAvailable, highSlotUtilization, lowSlotUtilization } = loadState;
 
   // RULE 1: CRITICAL EVENTS NEVER DROP & ALWAYS STREAM
   if (priority === "CRITICAL") {
@@ -34,7 +34,7 @@ export function evaluateDecision(
 
   // RULE 2: HIGH PRIORITY (INVENTORY) - MICRO-BATCH UNDER LOAD, NEVER SHED
   if (priority === "HIGH") {
-    if (systemMode === "NORMAL" && queueUtilization < 55) {
+    if (systemMode === "NORMAL" && queueUtilization < 55 && highSlotUtilization < 85) {
       return {
         decision: "STREAM",
         reason: "Inventory update routed via immediate STREAM (nominal load and low queue depth).",
@@ -45,7 +45,7 @@ export function evaluateDecision(
     } else {
       return {
         decision: "BATCH",
-        reason: `Inventory event grouped into micro-batch (50ms buffer). Queue load at ${queueUtilization.toFixed(1)}% to prevent DB lockups.`,
+        reason: `Inventory event grouped into micro-batch (reserved HIGH capacity; queue ${queueUtilization.toFixed(1)}%, slot load ${highSlotUtilization.toFixed(1)}%) to prevent DB lockups.`,
         priority,
         isGuaranteedZeroDrop: true,
         systemMode,
@@ -63,10 +63,10 @@ export function evaluateDecision(
         isGuaranteedZeroDrop: false,
         systemMode,
       };
-    } else if (systemMode === "SPIKE" || (queueUtilization >= 50 && queueUtilization < 82)) {
+    } else if (systemMode === "SPIKE" || workerSlotsAvailable === 0 || lowSlotUtilization >= 100 || (queueUtilization >= 50 && queueUtilization < 82)) {
       return {
         decision: "DEFER",
-        reason: `Click telemetry deferred to secondary buffer (queue utilization ${queueUtilization.toFixed(1)}%) to safeguard payment processing.`,
+        reason: `Click telemetry explicitly deferred (queue ${queueUtilization.toFixed(1)}%, low slot load ${lowSlotUtilization.toFixed(1)}%) to safeguard payment processing.`,
         priority,
         isGuaranteedZeroDrop: false,
         systemMode,

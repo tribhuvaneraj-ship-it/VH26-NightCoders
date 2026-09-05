@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "test": "npm run build && node --test dist/services/workerSlotManager.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

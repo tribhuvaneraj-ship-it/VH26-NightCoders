@@ -96,6 +96,7 @@ export default function DashboardPage() {
             queues={queues}
             queueUtilization={snapshot?.queueUtilization ?? 0}
             systemMode={systemMode}
+            workerSlots={snapshot?.workerSlots}
           />
           <EventStrategyMatrix systemMode={systemMode} />
         </div>

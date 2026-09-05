@@ -7,6 +7,10 @@ export interface SystemLoadState {
   criticalQueueDepth: number;
   totalQueued: number;
   systemMode: SystemMode;
+  workerSlotsAvailable: number;
+  criticalSlotUtilization: number;
+  highSlotUtilization: number;
+  lowSlotUtilization: number;
 }
 
 export class BackpressureController {

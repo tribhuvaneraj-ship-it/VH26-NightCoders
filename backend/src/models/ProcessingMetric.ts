@@ -13,6 +13,7 @@ export interface IProcessingMetricDocument extends Document {
     critical: number;
     high: number;
     low: number;
+    deferred: number;
   };
   queueDepths: {
     critical: number;
@@ -28,6 +29,7 @@ export interface IProcessingMetricDocument extends Document {
   };
   activeWorkers: number;
   workerUtilization: number;
+  workerSlots: Record<string, number>;
 }
 
 const ProcessingMetricSchema: Schema = new Schema(
@@ -48,6 +50,7 @@ const ProcessingMetricSchema: Schema = new Schema(
       critical: { type: Number, default: 0 },
       high: { type: Number, default: 0 },
       low: { type: Number, default: 0 },
+      deferred: { type: Number, default: 0 },
       total: { type: Number, default: 0 },
     },
     processingBreakdown: {
@@ -58,6 +61,7 @@ const ProcessingMetricSchema: Schema = new Schema(
     },
     activeWorkers: { type: Number, default: 0 },
     workerUtilization: { type: Number, default: 0 },
+    workerSlots: { type: Schema.Types.Mixed, default: {} },
   },
   {
     timestamps: false,

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ShieldCheck, Zap, Layers, RefreshCw, AlertCircle } from "lucide-react";
-import { SystemMode } from "../types";
+import { SystemMode, WorkerSlotMetrics } from "../types";
 
 interface QueueMonitorProps {
   queues: {
@@ -14,12 +14,14 @@ interface QueueMonitorProps {
   };
   queueUtilization: number;
   systemMode: SystemMode;
+  workerSlots?: WorkerSlotMetrics;
 }
 
 export const QueueMonitor: React.FC<QueueMonitorProps> = ({
   queues,
   queueUtilization,
   systemMode,
+  workerSlots,
 }) => {
   const critPct = Math.min(100, Math.round((queues.critical / 2000) * 100));
   const highPct = Math.min(100, Math.round((queues.high / 1500) * 100));
@@ -46,6 +48,16 @@ export const QueueMonitor: React.FC<QueueMonitorProps> = ({
       </div>
 
       <div className="space-y-4">
+        {workerSlots && (
+          <div className="bg-slate-950/60 border border-emerald-500/20 rounded-xl p-3 text-xs font-mono text-slate-300">
+            <div className="flex justify-between text-emerald-300 mb-2"><span>Persistent worker-slot reservations</span><span>{workerSlots.availableSlots}/{workerSlots.totalSlots} available · {workerSlots.borrowedSlots} borrowed</span></div>
+            <div className="grid grid-cols-3 gap-2 text-[10px]">
+              <span>CRITICAL {workerSlots.criticalActiveSlots}/{workerSlots.criticalReservedSlots} active · {workerSlots.criticalWaiting} waiting</span>
+              <span>HIGH {workerSlots.highActiveSlots}/{workerSlots.highReservedSlots} active · {workerSlots.highWaiting} waiting</span>
+              <span>LOW {workerSlots.lowActiveSlots}/{workerSlots.lowReservedSlots} active · {workerSlots.lowWaiting} waiting</span>
+            </div>
+          </div>
+        )}
         {/* Critical Queue Lane */}
         <div className="bg-slate-950/60 border border-cyan-500/20 rounded-xl p-3.5 hover:border-cyan-500/40 transition-all">
           <div className="flex items-center justify-between mb-1.5">

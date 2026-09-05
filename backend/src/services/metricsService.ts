@@ -12,6 +12,7 @@ import { ProcessingMetricModel } from "../models/ProcessingMetric.js";
 import { DecisionLogModel } from "../models/DecisionLog.js";
 import { EventModel } from "../models/Event.js";
 import { isDbConnected } from "../config/db.js";
+import { workerSlotManager } from "./workerSlotManager.js";
 
 export class MetricsService {
   // Lifetime counters
@@ -116,13 +117,15 @@ export class MetricsService {
       if (this.recentDecisions.length > 100) this.recentDecisions.pop();
 
       // Async write to MongoDB if connected
-      if (isDbConnected() && Math.random() < 0.1) {
+      // SHED is an intentional, auditable decision; never sample it away.
+      if (isDbConnected() && (mode === "SHED" || Math.random() < 0.1)) {
         DecisionLogModel.create(decisionEntry).catch(() => {});
       }
     }
 
     // Async sample persist event
-    if (isDbConnected() && Math.random() < 0.05) {
+    // Persist batch-bearing records so a batchId is never only an in-memory fact.
+    if (isDbConnected() && (event.batchId || Math.random() < 0.05)) {
       EventModel.create(event).catch(() => {});
     }
   }
@@ -180,6 +183,7 @@ export class MetricsService {
     const highLat = this.getLatencyAverage("HIGH");
     const lowLat = this.getLatencyAverage("LOW");
     const avgLat = parseFloat(((critLat + highLat + lowLat) / 3).toFixed(1));
+    const workerSlots = workerSlotManager.getMetrics();
 
     return {
       timestamp: new Date(),
@@ -198,6 +202,7 @@ export class MetricsService {
         critical: queueDepths.critical,
         high: queueDepths.high,
         low: queueDepths.low,
+        deferred: queueDepths.deferred,
         total: queueDepths.total,
       },
       processingBreakdown: {
@@ -206,8 +211,9 @@ export class MetricsService {
         deferred: this.totalDeferred,
         shed: this.totalShed,
       },
-      activeWorkers: this.activeWorkersCount,
-      workerUtilization: this.workerUtilizationPct,
+      activeWorkers: workerSlots.criticalActiveSlots + workerSlots.highActiveSlots + workerSlots.lowActiveSlots,
+      workerUtilization: Math.round(((workerSlots.totalSlots - workerSlots.availableSlots) / workerSlots.totalSlots) * 100),
+      workerSlots,
     };
   }
 

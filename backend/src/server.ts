@@ -44,8 +44,9 @@ async function bootstrap() {
   console.log("⚡ FLASHGUARD: Intelligent Adaptive Data Processing");
   console.log("==================================================");
 
-  // Initialize DB connection (or in-memory fallback)
-  await connectDB();
+  // Connect in the background so an unavailable remote database never blocks
+  // the API's in-memory fallback from becoming available.
+  void connectDB();
 
   // Start background worker execution pools
   workerPoolService.start();

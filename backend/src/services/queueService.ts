@@ -63,6 +63,18 @@ export class PriorityQueueManager {
     return this.criticalQueue.splice(0, count);
   }
 
+  /** Queue-safe worker API: inspect first, remove only after a slot/decision. */
+  public peek(priority: Priority): PipelineEvent | undefined {
+    return priority === "CRITICAL" ? this.criticalQueue[0] : priority === "HIGH" ? this.highQueue[0] : this.lowQueue[0];
+  }
+
+  public dequeue(priority: Priority): PipelineEvent | undefined {
+    const queue = priority === "CRITICAL" ? this.criticalQueue : priority === "HIGH" ? this.highQueue : this.lowQueue;
+    const event = queue.shift();
+    if (event) this.totalDequeued++;
+    return event;
+  }
+
   public drainHigh(maxCount: number = 40): PipelineEvent[] {
     const count = Math.min(maxCount, this.highQueue.length);
     if (count === 0) return [];

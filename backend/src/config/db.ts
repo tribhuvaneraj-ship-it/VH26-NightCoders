@@ -3,9 +3,13 @@ import { config } from "./env.js";
 
 let isConnected = false;
 
+function redactConnectionString(connectionString: string): string {
+  return connectionString.replace(/(mongodb(?:\+srv)?:\/\/)[^@/]+@/, "$1***@");
+}
+
 export async function connectDB(): Promise<boolean> {
   try {
-    console.log(`[Database] Attempting connection to MongoDB at: ${config.MONGODB_URI}`);
+    console.log(`[Database] Attempting connection to MongoDB at: ${redactConnectionString(config.MONGODB_URI)}`);
     mongoose.set("strictQuery", false);
 
     // Short timeout for hackathon/demo resiliency: fallback seamlessly if no local daemon is running
