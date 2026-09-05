@@ -37,7 +37,7 @@ Traditional data pipelines treat every incoming event equally through a naive Fi
            ┌────────────────────────┼────────────────────────┐
            ▼                        ▼                        ▼
     [ CRITICAL LANE ]        [ HIGH BATCH LANE ]     [ LOW ADAPTIVE LANE ]
-  (PAYMENT, ORDER: 100%)       (INVENTORY: 50ms)       (CLICK, LOG: Defer/Shed)
+  (PAYMENT, ORDER: 65%)       (INVENTORY: 25%)       (CLICK, LOG: Defer/Shed :-10% )
            │                        │                        │
            ▼                        ▼                        ▼
    Dedicated Fast-Lane      Micro-Batch Worker       Dynamic Shedding &
