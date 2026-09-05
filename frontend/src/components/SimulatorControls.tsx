@@ -4,28 +4,23 @@ import React, { useState } from "react";
 import { Flame, Play, Square, Sliders, Zap, Sparkles } from "lucide-react";
 import { api } from "../lib/api";
 import { SimulatorStatus } from "../types";
-
 interface SimulatorControlsProps {
   simulator: SimulatorStatus | null;
   onOpenBenchmark: () => void;
 }
-
 export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
   simulator,
   onOpenBenchmark,
 }) => {
   const [customRate, setCustomRate] = useState<number>(5000);
   const isFlashSale = simulator?.isFlashSaleActive;
-
   const handleStartNormal = () => api.startNormal();
   const handleStartFlashSale = () => api.startFlashSale(23000);
   const handleStop = () => api.stopTraffic();
   const handleApplyCustom = () => api.setCustomRate(customRate);
-
   const handleBurst = (count: number, type?: string) => {
     api.injectBurst(count, type);
   };
-
   return (
     <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -38,7 +33,6 @@ export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
             Simulate realistic e-commerce traffic surges up to 25,000+ events/min
           </p>
         </div>
-
         {/* Benchmark Suite CTA */}
         <button
           onClick={onOpenBenchmark}
@@ -48,7 +42,6 @@ export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
           <span>Run 3-Tier Benchmark Suite</span>
         </button>
       </div>
-
       {/* Main Preset Triggers */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
         {/* Normal Load */}
@@ -72,7 +65,6 @@ export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
           <Flame className="w-4 h-4 text-white" />
           <span>{isFlashSale ? "🔥 FLASH SALE ACTIVE" : "🔥 START FLASH SALE (22.5k/min)"}</span>
         </button>
-
         {/* Stop Traffic */}
         <button
           onClick={handleStop}
@@ -82,7 +74,6 @@ export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
           <span>Halt All Traffic</span>
         </button>
       </div>
-
       {/* Custom Slider & Instant Bursts */}
       <div className="pt-2 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
         {/* Slider */}
@@ -109,7 +100,6 @@ export const SimulatorControls: React.FC<SimulatorControlsProps> = ({
             </button>
           </div>
         </div>
-
         {/* Instant Burst Injections */}
         <div className="space-y-1.5">
           <div className="text-xs text-slate-400 font-mono">Inject Instant Burst:</div>
